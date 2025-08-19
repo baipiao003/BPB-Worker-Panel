@@ -1,3 +1,4 @@
 # ⚙️ Bug fixes and Improvements
 
-- Fixed Proxy IPv4 with custom port
+- Fixed Fingerprint not applied to Normal configs
+- Display errors in same page

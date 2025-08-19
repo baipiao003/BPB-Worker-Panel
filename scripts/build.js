@@ -10,8 +10,8 @@ import JSZip from "jszip";
 import obfs from 'javascript-obfuscator';
 import pkg from '../package.json' with { type: 'json' };
 
-const env = process.env.NODE_ENV || 'obfuscate';
-const mangleMode = env !== 'obfuscate';
+const env = process.env.NODE_ENV || 'mangle';
+const mangleMode = env === 'mangle';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = pathDirname(__filename);
@@ -37,14 +37,16 @@ async function processHtmlPages() {
         const base = (file) => join(ASSET_PATH, dir, file);
 
         const indexHtml = readFileSync(base('index.html'), 'utf8');
-        const styleCode = readFileSync(base('style.css'), 'utf8');
-        const scriptCode = readFileSync(base('script.js'), 'utf8');
+        let finalHtml = indexHtml.replaceAll('__VERSION__', version);
 
-        const finalScriptCode = await jsMinify(scriptCode);
-        const finalHtml = indexHtml
-            .replaceAll('__STYLE__', `<style>${styleCode}</style>`)
-            .replaceAll('__SCRIPT__', finalScriptCode.code)
-            .replaceAll('__PANEL_VERSION__', version);
+        if (dir !== 'error') {
+            const styleCode = readFileSync(base('style.css'), 'utf8');
+            const scriptCode = readFileSync(base('script.js'), 'utf8');
+            const finalScriptCode = await jsMinify(scriptCode);
+            finalHtml = finalHtml
+                .replaceAll('__STYLE__', `<style>${styleCode}</style>`)
+                .replaceAll('__SCRIPT__', finalScriptCode.code);
+        }
 
         const minifiedHtml = htmlMinify(finalHtml, {
             collapseWhitespace: true,
@@ -101,7 +103,7 @@ async function buildWorker() {
             __ERROR_HTML_CONTENT__: htmls['error'] ?? '""',
             __SECRETS_HTML_CONTENT__: htmls['secrets'] ?? '""',
             __ICON__: JSON.stringify(faviconBase64),
-            __PANEL_VERSION__: JSON.stringify(version)
+            __VERSION__: JSON.stringify(version)
         }
     });
 
