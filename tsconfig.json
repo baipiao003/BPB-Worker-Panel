@@ -12,6 +12,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "paths": {
+            "*": ["./src/*"],
             "@xray/*": ["./src/cores/xray/*"],
             "@sing-box/*": ["./src/cores/sing-box/*"],
             "@clash/*": ["./src/cores/clash/*"],
