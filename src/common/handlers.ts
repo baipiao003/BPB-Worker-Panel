@@ -330,7 +330,8 @@ async function getWarpConfigs(request: Request, env: Env): Promise<Response> {
     const trimLines = (str: string) => str.split("\n").map(line => line.trim()).join("\n");
 
     try {
-        warpEndpoints?.forEach((endpoint, index) => {
+        // [修改处] 为 endpoint 和 index 添加显式的类型声明
+        warpEndpoints?.forEach((endpoint: string, index: number) => {
             const config =
                 `[Interface]
                 PrivateKey = ${privateKey}
@@ -381,7 +382,8 @@ async function getProxyIPsInfo(): Promise<Response> {
 
 export async function serveIcon(): Promise<Response> {
     const faviconBase64 = __ICON__;
-    const body = Uint8Array.from(atob(faviconBase64), c => c.charCodeAt(0));
+    // [修改处] 为 c 添加显式的 string 类型声明
+    const body = Uint8Array.from(atob(faviconBase64), (c: string) => c.charCodeAt(0));
 
     return new Response(body, {
         headers: {
@@ -454,7 +456,8 @@ async function updateWarpConfigs(request: Request, env: Env): Promise<Response> 
 }
 
 async function decompressHtml(content: string, asString: boolean): Promise<string | ReadableStream<Uint8Array>> {
-    const bytes = Uint8Array.from(atob(content), c => c.charCodeAt(0));
+    // [修改处] 为 c 添加显式的 string 类型声明
+    const bytes = Uint8Array.from(atob(content), (c: string) => c.charCodeAt(0));
     const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
 
     if (asString) {
